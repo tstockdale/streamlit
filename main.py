@@ -9,6 +9,7 @@ import services
 from utils import unix_to_datetime
 from utils import uvi_to_risk_string
 from utils import lat_lon_to_world_coordinates
+from logging.handlers import RotatingFileHandler
 
 
 def update_map(lat, lon, map_style='mapbox://styles/mapbox/streets-v12'):
@@ -79,7 +80,7 @@ def main():
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler("app.log"),
+            RotatingFileHandler("app.log", maxBytes=10 * 1024 * 1024, backupCount=5),
             logging.StreamHandler()
         ]
     )
