@@ -40,7 +40,6 @@ def update_map_weather(lat, lon, map_style='mapbox://styles/mapbox/streets-v12',
     zoom_level = 4
     x, y = lat_lon_to_world_coordinates(lat, lon, zoom_level)
     # Define the weather tile layer URL
-    #tile_url = f"https://tile.openweathermap.org/map/{weather_layer}/{{z}}/{{x}}/{{y}}.png?appid={api_key}"
     tile_url = f"http://tile.openweathermap.org/maps/2.0/weather/{weather_layer}/{zoom_level}/{x}/{y}.png?appid={api_key}"
     print(tile_url)
 
@@ -137,7 +136,6 @@ def main():
             if city is not None:
                 lat, lon = city[0]['lat'], city[0]['lon']
                 update_map(lat, lon, MAP_STYLES[selected_style])
-                #update_map_weather(lat, lon, map_style=MAP_STYLES[selected_style], api_key=api_key, weather_layer='clouds_new')
             else:
                 st.write(f"City {selected_city} not found.")
 
