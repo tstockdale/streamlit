@@ -6,6 +6,7 @@
 __pycache__/
 *.egg-info/
 *.eggs/
+pyenv.cfg
 
 # directories
 bin/
