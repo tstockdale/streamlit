@@ -22,6 +22,7 @@ def get_api_key_from_vault(secret_path, secret_key, vault_url, vault_token):
     """
     try:
         # Initialize the Vault client
+        # test
         client = hvac.Client(
             url=vault_url,
             token=vault_token
