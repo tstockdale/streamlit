@@ -1,6 +1,5 @@
 import requests
 import hvac
-import os
 import logging
 
 

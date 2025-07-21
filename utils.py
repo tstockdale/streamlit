@@ -53,3 +53,17 @@ def lat_lon_to_world_coordinates(lat, lon, zoom=0):
     y_world = y * scale
 
     return x_world, y_world
+
+def celsius_to_fahrenheit(celsius):
+    """
+    Convert temperature from Celsius to Fahrenheit.
+
+    Args:
+        celsius (float): Temperature in Celsius.
+
+    Returns:
+        float: Temperature in Fahrenheit.
+    """
+    return celsius * 9.0 / 5.0 + 32.0
+
+
