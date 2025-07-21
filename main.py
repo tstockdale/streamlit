@@ -2,6 +2,8 @@ import streamlit as st
 import pydeck as pdk
 import logging
 from dotenv import load_dotenv
+import folium
+from streamlit_folium import st_folium
 import os
 
 from config import MAP_STYLES
@@ -10,6 +12,7 @@ from utils import unix_to_datetime
 from utils import uvi_to_risk_string
 from utils import lat_lon_to_world_coordinates
 from utils import celsius_to_fahrenheit
+from utils import lat_lon_to_tile_coordinates
 
 import pandas as pd
 
@@ -27,7 +30,7 @@ def update_map(lat, lon, map_style='mapbox://styles/mapbox/streets-v12'):
         ),
 ))
 
-def update_map_weather(lat, lon, map_style='mapbox://styles/mapbox/streets-v12', api_key=None, weather_layer='clouds_new'):
+def update_weather_map(lat, lon, map_style='mapbox://styles/mapbox/streets-v12', api_key=None, weather_layer='precipitation'):
     """
     Update the map with a weather overlay from OpenWeatherMap.
 
@@ -41,10 +44,10 @@ def update_map_weather(lat, lon, map_style='mapbox://styles/mapbox/streets-v12',
     if not api_key:
         st.error("API key is required to fetch weather map tiles.")
         return
-    zoom_level = 4
-    x, y = lat_lon_to_world_coordinates(lat, lon, zoom_level)
+    zoom_level = 9
+    x, y = lat_lon_to_tile_coordinates(lat, lon, zoom_level)
     # Define the weather tile layer URL
-    tile_url = f"http://tile.openweathermap.org/maps/2.0/weather/{weather_layer}/{zoom_level}/{x}/{y}.png?appid={api_key}"
+    tile_url = f"http://tile.openweathermap.org/map/{weather_layer}/{zoom_level}/{x}/{y}.png?appid={api_key}"
     print(tile_url)
 
     # Create the PyDeck map with the weather tile layer
@@ -53,21 +56,44 @@ def update_map_weather(lat, lon, map_style='mapbox://styles/mapbox/streets-v12',
         initial_view_state=pdk.ViewState(
             latitude=lat,
             longitude=lon,
-            zoom=5,
+            zoom=zoom_level,
             pitch=50,
         ),
         layers=[
             # Weather tile layer
             pdk.Layer(
                 "TileLayer",
-                data=None,
-                get_tile_url=tile_url,
+                data=tile_url,
+                #get_tile_url=tile_url,
                 min_zoom=0,
                 max_zoom=12,
-                tile_size=256,
+                tile_size=2**zoom_level,
             )
         ]
     ))
+
+def update_weather_map_folium(lat, lon, api_key=None, weather_layer='precipitation'):
+    if not api_key:
+        st.error("API key is required to fetch weather map tiles.")
+        return
+    zoom_level = 10
+    x, y = lat_lon_to_tile_coordinates(lat, lon, zoom_level)
+    # Define the weather tile layer URL
+    tile_url = f"http://tile.openweathermap.org/map/{weather_layer}/{zoom_level}/{x}/{y}.png?appid={api_key}"
+    print(tile_url)
+
+    # Create the Folium map with the weather tile layer
+    folium_map = folium.Map(location=[lat, lon], zoom_start=zoom_level)
+    folium.TileLayer(
+        tiles=tile_url,
+        attr='OpenWeatherMap',
+        name=weather_layer,
+        overlay=True,
+        control=True
+    ).add_to(folium_map)
+    folium_map.add_child(folium.LayerControl())
+    st_folium(folium_map, width=350, height=500)
+
 
 def extract_hourly_table(weather, timezone):
     hourly = weather.get('hourly', [])
@@ -156,10 +182,12 @@ def main():
             logging.info(city)
             if city is not None:
                 lat, lon = city[0]['lat'], city[0]['lon']
-                update_map(lat, lon, MAP_STYLES[selected_style])
+                #update_map(lat, lon, MAP_STYLES[selected_style])
+                #update_weather_map(lat, lon, MAP_STYLES[selected_style], api_key,'precipitation_new')
+                update_weather_map_folium(lat, lon, api_key, 'precipitation_new')
             else:
                 st.write(f"City {selected_city} not found.")
-                
+
     hourly_df = None
     with weather_column:
         if selected_city and city is not None and 'lat' in locals() and 'lon' in locals():

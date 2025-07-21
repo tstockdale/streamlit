@@ -66,4 +66,24 @@ def celsius_to_fahrenheit(celsius):
     """
     return celsius * 9.0 / 5.0 + 32.0
 
+def lat_lon_to_tile_coordinates(lat, lon, zoom):
+    """
+    Convert latitude and longitude to tile coordinates (x, y) for a given zoom level
+    using the Web Mercator projection.
+
+    Args:
+        lat (float): Latitude in degrees.
+        lon (float): Longitude in degrees.
+        zoom (int): Zoom level.
+
+    Returns:
+        tuple: (x_tile, y_tile) tile coordinates as integers.
+    """
+
+    n = 2 ** zoom
+    lat_rad = math.radians(lat)
+    x_tile = int(n * ((lon + 180) / 360))
+    y_tile = int(n * (1 - (math.log(math.tan(lat_rad) + 1 / math.cos(lat_rad)) / math.pi)) / 2)
+    return x_tile, y_tile
+
 
