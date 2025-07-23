@@ -3,13 +3,11 @@ WeatherApp class - Main application logic for the World Cities Weather Map.
 """
 
 import streamlit as st
-import logging
 import os
 import pandas as pd
 from dotenv import load_dotenv
 import folium
 from streamlit_folium import st_folium
-from logging.handlers import RotatingFileHandler
 from typing import Optional, Dict, Any, Tuple
 
 from .config import MAP_STYLES
@@ -21,14 +19,12 @@ from .utils import (
     meters_per_second_to_miles_per_hour,
     lat_lon_to_tile_coordinates
 )
+from .logging_config import setup_logging, get_logger, PerformanceLogger
 
 # Constants
 DEFAULT_ZOOM_LEVEL = 10
 MAP_WIDTH = 350
 MAP_HEIGHT = 500
-LOG_FILE = "app.log"
-LOG_MAX_BYTES = 10 * 1024 * 1024  # 10MB
-LOG_BACKUP_COUNT = 5
 
 
 class WeatherApp:
@@ -37,21 +33,14 @@ class WeatherApp:
     def __init__(self):
         """Initialize the weather application."""
         self.api_key = None
-        self.logger = self._setup_logging()
+        self._setup_logging()
+        self.logger = get_logger(__name__)
         self._load_environment()
         self._initialize_api_key()
     
-    def _setup_logging(self) -> logging.Logger:
+    def _setup_logging(self) -> None:
         """Configure application logging."""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                RotatingFileHandler(LOG_FILE, maxBytes=LOG_MAX_BYTES, backupCount=LOG_BACKUP_COUNT),
-                logging.StreamHandler()
-            ]
-        )
-        return logging.getLogger(__name__)
+        setup_logging()
     
     def _load_environment(self) -> None:
         """Load environment variables."""
@@ -325,44 +314,55 @@ class WeatherApp:
             map_column: Streamlit column for map
             weather_column: Streamlit column for weather info
         """
-        # Get city coordinates
-        city_data = services.get_lat_lon(city_name, state_name, country_name, self.api_key)
-        self.logger.info(f"City data retrieved: {city_data}")
-        
-        if not city_data:
-            with weather_column:
-                st.write(f"City '{city_name}' not found.")
-            return
-        
-        city_info = city_data[0]
-        lat, lon = city_info['lat'], city_info['lon']
-        
-        # Display map
-        with map_column:
-            self.create_weather_map(lat, lon)
-        
-        # Get and display weather data
-        weather_data = services.get_weather(lat, lon, self.api_key)
-        
-        if not weather_data:
-            with weather_column:
-                st.write("Unable to retrieve weather data.")
-            return
-        
-        self.logger.info(f"Weather data retrieved for {city_name}")
-        
-        with weather_column:
-            self.display_current_weather(weather_data, city_info)
-        
-        # Display hourly forecast
-        if 'hourly' in weather_data:
-            hourly_df = self.create_hourly_forecast_table(weather_data)
-            if hourly_df is not None and not hourly_df.empty:
-                st.write("## Hourly Forecast")
-                st.dataframe(
-                    hourly_df.sort_values(by="Time", ascending=True).reset_index(drop=True),
-                    use_container_width=False,   
-                )
+        with PerformanceLogger(f"process_city_weather_{city_name}", self.logger):
+            # Get city coordinates
+            with PerformanceLogger(f"get_coordinates_{city_name}", self.logger):
+                city_data = services.get_lat_lon(city_name, state_name, country_name, self.api_key)
+                self.logger.info(f"Processing weather request for: {city_name}, {state_name}, {country_name}")
+            
+            if not city_data:
+                self.logger.warning(f"No location data found for: {city_name}")
+                with weather_column:
+                    st.write(f"City '{city_name}' not found.")
+                return
+            
+            city_info = city_data[0]
+            lat, lon = city_info['lat'], city_info['lon']
+            self.logger.info(f"Using coordinates: ({lat}, {lon}) for {city_info.get('name', city_name)}")
+            
+            # Display map
+            with PerformanceLogger(f"create_map_{city_name}", self.logger):
+                with map_column:
+                    self.create_weather_map(lat, lon)
+            
+            # Get and display weather data
+            with PerformanceLogger(f"get_weather_data_{city_name}", self.logger):
+                weather_data = services.get_weather(lat, lon, self.api_key)
+            
+            if not weather_data:
+                self.logger.error(f"Failed to retrieve weather data for {city_name}")
+                with weather_column:
+                    st.write("Unable to retrieve weather data.")
+                return
+            
+            self.logger.info(f"Successfully processed weather data for {city_name}")
+            
+            # Display current weather
+            with PerformanceLogger(f"display_current_weather_{city_name}", self.logger):
+                with weather_column:
+                    self.display_current_weather(weather_data, city_info)
+            
+            # Display hourly forecast
+            if 'hourly' in weather_data:
+                with PerformanceLogger(f"create_hourly_forecast_{city_name}", self.logger):
+                    hourly_df = self.create_hourly_forecast_table(weather_data)
+                    if hourly_df is not None and not hourly_df.empty:
+                        st.write("## Hourly Forecast")
+                        st.dataframe(
+                            hourly_df.sort_values(by="Time", ascending=True).reset_index(drop=True),
+                            use_container_width=False,   
+                        )
+                        self.logger.info(f"Displayed hourly forecast with {len(hourly_df)} entries")
     
     def run(self) -> None:
         """Run the weather application."""
