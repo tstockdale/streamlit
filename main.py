@@ -111,7 +111,6 @@ def extract_hourly_table(weather, timezone):
             "Feels Like (°F)": f"{celsius_to_fahrenheit(h.get('feels_like')):.1f}" if h.get('feels_like') is not None else None,
             "Humidity (%)": h.get('humidity'),
             "Wind Speed (mi/h)":f"{wind_speed_mph:.1f}" if wind_speed_mph is not None else None,
-            "Feels Like (°F)": celsius_to_fahrenheit(h.get('feels_like')) if h.get('feels_like') is not None else None,
             "One Hour Rain (mm)": rain.get('1h') if isinstance(rain, dict) and rain.get('1h') is not None else None,
             "Description": h.get('weather', [{}])[0].get('description', '').capitalize() if h.get('weather') else None,
         })
@@ -222,7 +221,7 @@ def main():
             feels_like = current.get('feels_like')
             if feels_like is not None:
                 fahrenheit = celsius_to_fahrenheit(feels_like)
-                st.write(f"Feels like: {feels_like}°C / {fahrenheit:.1f}°F")
+                st.write(f"Feels like: {fahrenheit:.1f}°F")
             # UV Index
             uvi = current.get('uvi')
             if uvi is not None:
@@ -236,8 +235,9 @@ def main():
             if wind_speed is not None:
                 st.write(f"Wind Speed: {wind_speed:.1f} mi/h")
             # Wind gust
-            wind_gust = meters_per_second_to_miles_per_hour(current.get('wind_gust'))
+            wind_gust = current.get('wind_gust')
             if wind_gust is not None:
+                wind_gust = meters_per_second_to_miles_per_hour(current.get('wind_gust'))
                 st.write(f"Wind Gusts up to: {wind_gust:.1f} mi/h")
             # Rain
             rain = current.get('rain')
