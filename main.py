@@ -107,8 +107,8 @@ def extract_hourly_table(weather, timezone):
         wind_speed_mph = meters_per_second_to_miles_per_hour(wind_speed) if wind_speed is not None else None
         rows.append({
             "Time": unix_to_datetime(h['dt'], timezone),
-            "Temp (°F)": celsius_to_fahrenheit(h.get('temp')) if h.get('temp') is not None else None,
-            "Feels Like (°F)": celsius_to_fahrenheit(h.get('feels_like')) if h.get('feels_like') is not None else None,
+            "Temp (°F)": f"{celsius_to_fahrenheit(h.get('temp')):.1f}" if h.get('temp') is not None else None,
+            "Feels Like (°F)": f"{celsius_to_fahrenheit(h.get('feels_like')):.1f}" if h.get('feels_like') is not None else None,
             "Humidity (%)": h.get('humidity'),
             "Wind Speed (mi/h)":f"{wind_speed_mph:.1f}" if wind_speed_mph is not None else None,
             "Feels Like (°F)": celsius_to_fahrenheit(h.get('feels_like')) if h.get('feels_like') is not None else None,
