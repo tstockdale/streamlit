@@ -684,3 +684,43 @@
 2025-07-23 15:43:08 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_hourly_forecast_Hamburg
 2025-07-23 15:43:08 - src.weather_map.weather_app - INFO - weather_app:_render_hourly_forecast_section:388 - Displayed hourly forecast with 48 entries
 2025-07-23 15:43:08 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_hourly_forecast_Hamburg in 0.005s
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_NonexistentCity
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_NonexistentCity
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:328 - Processing weather request for: NonexistentCity, , 
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_NonexistentCity in 0.000s
+2025-07-23 15:52:33 - src.weather_map.weather_app - WARNING - weather_app:_process_city_weather:331 - No location data found for: NonexistentCity
+2025-07-23 15:52:33 - src.weather_map.weather_app - ERROR - logging_config:__exit__:205 - Failed operation: process_city_weather_NonexistentCity after 0.000s - 'Mock' object does not support the context manager protocol
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:328 - Processing weather request for: New York, NY, US
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_New York in 0.000s
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:338 - Using coordinates: (40.7128, -74.006) for New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_map_New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - ERROR - logging_config:__exit__:205 - Failed operation: create_map_New York after 0.000s - 'Mock' object does not support the context manager protocol
+2025-07-23 15:52:33 - src.weather_map.weather_app - ERROR - logging_config:__exit__:205 - Failed operation: process_city_weather_New York after 0.000s - 'Mock' object does not support the context manager protocol
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:328 - Processing weather request for: New York, NY, US
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_New York in 0.000s
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:338 - Using coordinates: (40.7128, -74.006) for New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_map_New York
+2025-07-23 15:52:33 - src.weather_map.weather_app - ERROR - logging_config:__exit__:205 - Failed operation: create_map_New York after 0.000s - 'Mock' object does not support the context manager protocol
+2025-07-23 15:52:33 - src.weather_map.weather_app - ERROR - logging_config:__exit__:205 - Failed operation: process_city_weather_New York after 0.000s - 'Mock' object does not support the context manager protocol
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
+2025-07-23 15:52:33 - src.weather_map.weather_app - CRITICAL - weather_app:_initialize_api_key:61 - Error retrieving API key: Vault connection failed
+2025-07-23 15:52:33 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:59 - API key retrieved successfully from Vault.
