@@ -2,7 +2,7 @@ import unittest
 import math
 import pytz
 from datetime import datetime
-from utils import (
+from src.weather_map.utils import (
     unix_to_datetime,
     uvi_to_risk_string,
     lat_lon_to_world_coordinates,
