@@ -246,12 +246,12 @@ class WeatherApp:
                     f"{celsius_to_fahrenheit(hour_data.get('feels_like')):.1f}" 
                     if hour_data.get('feels_like') is not None else None
                 ),
+                "One Hour Rain (mm)": (
+                    rain.get('1h') if isinstance(rain, dict) and rain.get('1h') is not None else None
+                ),
                 "Humidity (%)": hour_data.get('humidity'),
                 "Wind Speed (mi/h)": (
                     f"{wind_speed_mph:.1f}" if wind_speed_mph is not None else None
-                ),
-                "One Hour Rain (mm)": (
-                    rain.get('1h') if isinstance(rain, dict) and rain.get('1h') is not None else None
                 ),
                 "Description": (
                     hour_data.get('weather', [{}])[0].get('description', '').capitalize() 
@@ -289,10 +289,14 @@ class WeatherApp:
             city_name, state_name, country_name = self.parse_city_input(selected_city)
             
             if city_name:  # Only proceed if we have at least a city name
-                self._process_city_weather(
+                weather_data = self._process_city_weather(
                     city_name, state_name, country_name, 
                     selected_style, map_column, weather_column
                 )
+                
+                # Display hourly forecast in a separate full-width section
+                if weather_data:
+                    self._render_hourly_forecast_section(weather_data, city_name)
     
     def _process_city_weather(
         self, 
@@ -302,7 +306,7 @@ class WeatherApp:
         selected_style: str,
         map_column,
         weather_column
-    ) -> None:
+    ) -> Optional[Dict[str, Any]]:
         """
         Process city weather data and display results.
         
@@ -313,6 +317,9 @@ class WeatherApp:
             selected_style: Selected map style
             map_column: Streamlit column for map
             weather_column: Streamlit column for weather info
+            
+        Returns:
+            Weather data dictionary or None if processing failed
         """
         with PerformanceLogger(f"process_city_weather_{city_name}", self.logger):
             # Get city coordinates
@@ -324,7 +331,7 @@ class WeatherApp:
                 self.logger.warning(f"No location data found for: {city_name}")
                 with weather_column:
                     st.write(f"City '{city_name}' not found.")
-                return
+                return None
             
             city_info = city_data[0]
             lat, lon = city_info['lat'], city_info['lon']
@@ -343,7 +350,7 @@ class WeatherApp:
                 self.logger.error(f"Failed to retrieve weather data for {city_name}")
                 with weather_column:
                     st.write("Unable to retrieve weather data.")
-                return
+                return None
             
             self.logger.info(f"Successfully processed weather data for {city_name}")
             
@@ -352,17 +359,35 @@ class WeatherApp:
                 with weather_column:
                     self.display_current_weather(weather_data, city_info)
             
-            # Display hourly forecast
-            if 'hourly' in weather_data:
-                with PerformanceLogger(f"create_hourly_forecast_{city_name}", self.logger):
-                    hourly_df = self.create_hourly_forecast_table(weather_data)
-                    if hourly_df is not None and not hourly_df.empty:
-                        st.write("## Hourly Forecast")
-                        st.dataframe(
-                            hourly_df.sort_values(by="Time", ascending=True).reset_index(drop=True),
-                            use_container_width=False,   
-                        )
-                        self.logger.info(f"Displayed hourly forecast with {len(hourly_df)} entries")
+            return weather_data
+    
+    def _render_hourly_forecast_section(self, weather_data: Dict[str, Any], city_name: str) -> None:
+        """
+        Render the hourly forecast section in a separate full-width component.
+        
+        Args:
+            weather_data: Weather data from API
+            city_name: Name of the city for logging
+        """
+        if 'hourly' not in weather_data:
+            return
+            
+        # Create a separator and section header
+        st.markdown("---")
+        st.subheader("📊 Hourly Forecast")
+        
+        with PerformanceLogger(f"create_hourly_forecast_{city_name}", self.logger):
+            hourly_df = self.create_hourly_forecast_table(weather_data)
+            if hourly_df is not None and not hourly_df.empty:
+                # Display the table with full container width
+                st.dataframe(
+                    hourly_df.sort_values(by="Time", ascending=True).reset_index(drop=True),
+                    use_container_width=True,
+                    height=400  # Set a reasonable height for scrolling
+                )
+                self.logger.info(f"Displayed hourly forecast with {len(hourly_df)} entries")
+            else:
+                st.info("No hourly forecast data available.")
     
     def run(self) -> None:
         """Run the weather application."""

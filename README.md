@@ -20,12 +20,14 @@ weather-map-app/
 │       ├── __init__.py
 │       ├── weather_app.py      # Main application class
 │       ├── config.py           # Configuration constants
+│       ├── logging_config.py   # Logging configuration and utilities
 │       ├── services.py         # API service functions
 │       └── utils.py            # Utility functions
 ├── tests/
 │   ├── __init__.py
 │   └── test_utils.py          # Unit tests for utility functions
 ├── docs/                      # Documentation directory
+│   └── logging_guide.md       # Comprehensive logging best practices guide
 ├── main.py                    # Application entry point
 ├── requirements.txt           # Python dependencies
 ├── setup.py                   # Package setup configuration
