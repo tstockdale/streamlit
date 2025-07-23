@@ -8,11 +8,14 @@ import os
 
 from config import MAP_STYLES
 import services
-from utils import unix_to_datetime
-from utils import uvi_to_risk_string
-from utils import lat_lon_to_world_coordinates
-from utils import celsius_to_fahrenheit
-from utils import lat_lon_to_tile_coordinates
+from utils import (
+    unix_to_datetime,
+    uvi_to_risk_string,
+    celsius_to_fahrenheit,
+    meters_per_second_to_miles_per_hour,
+    lat_lon_to_tile_coordinates
+)
+
 
 import pandas as pd
 
@@ -72,7 +75,7 @@ def update_weather_map(lat, lon, map_style='mapbox://styles/mapbox/streets-v12',
         ]
     ))
 
-def update_weather_map_folium(lat, lon, api_key=None, weather_layer='precipitation'):
+def update_weather_map_folium(lat, lon, api_key=None, weather_layer='precipitation_new'):
     if not api_key:
         st.error("API key is required to fetch weather map tiles.")
         return
@@ -100,12 +103,14 @@ def extract_hourly_table(weather, timezone):
     rows = []
     for h in hourly:
         rain = h.get('rain')
+        wind_speed = h.get('wind_speed')
+        wind_speed_mph = meters_per_second_to_miles_per_hour(wind_speed) if wind_speed is not None else None
         rows.append({
             "Time": unix_to_datetime(h['dt'], timezone),
             "Temp (°F)": celsius_to_fahrenheit(h.get('temp')) if h.get('temp') is not None else None,
             "Feels Like (°F)": celsius_to_fahrenheit(h.get('feels_like')) if h.get('feels_like') is not None else None,
             "Humidity (%)": h.get('humidity'),
-            "Wind Speed (m/s)": h.get('wind_speed'),
+            "Wind Speed (mi/h)":f"{wind_speed_mph:.1f}" if wind_speed_mph is not None else None,
             "Feels Like (°F)": celsius_to_fahrenheit(h.get('feels_like')) if h.get('feels_like') is not None else None,
             "One Hour Rain (mm)": rain.get('1h') if isinstance(rain, dict) and rain.get('1h') is not None else None,
             "Description": h.get('weather', [{}])[0].get('description', '').capitalize() if h.get('weather') else None,
@@ -184,7 +189,7 @@ def main():
                 lat, lon = city[0]['lat'], city[0]['lon']
                 #update_map(lat, lon, MAP_STYLES[selected_style])
                 #update_weather_map(lat, lon, MAP_STYLES[selected_style], api_key,'precipitation_new')
-                update_weather_map_folium(lat, lon, api_key, 'precipitation_new')
+                update_weather_map_folium(lat, lon, api_key)
             else:
                 st.write(f"City {selected_city} not found.")
 
@@ -227,13 +232,13 @@ def main():
             if humidity is not None:
                 st.write(f"Humidity: {humidity}%")
             # Wind speed
-            wind_speed = current.get('wind_speed')
+            wind_speed = meters_per_second_to_miles_per_hour(current.get('wind_speed'))
             if wind_speed is not None:
-                st.write(f"Wind Speed: {wind_speed} m/s")
+                st.write(f"Wind Speed: {wind_speed:.1f} mi/h")
             # Wind gust
-            wind_gust = current.get('wind_gust')
+            wind_gust = meters_per_second_to_miles_per_hour(current.get('wind_gust'))
             if wind_gust is not None:
-                st.write(f"Wind Gusts up to: {wind_gust} m/s")
+                st.write(f"Wind Gusts up to: {wind_gust:.1f} mi/h")
             # Rain
             rain = current.get('rain')
             if isinstance(rain, dict):

@@ -66,6 +66,20 @@ def celsius_to_fahrenheit(celsius):
     """
     return celsius * 9.0 / 5.0 + 32.0
 
+def meters_per_second_to_miles_per_hour(mps):
+    """
+    Convert speed from meters per second to miles per hour.
+
+    Args:
+        mps (float): Speed in meters per second.
+
+    Returns:
+        float: Speed in miles per hour.
+    """
+    # Conversion factor: 1 m/s = 2.23694 mph
+    # Derivation: 1 m/s × (3.28084 ft/m) × (1 mi/5280 ft) × (3600 s/hr) = 2.23694 mph
+    return mps * 2.23694
+
 def lat_lon_to_tile_coordinates(lat, lon, zoom):
     """
     Convert latitude and longitude to tile coordinates (x, y) for a given zoom level
@@ -85,5 +99,3 @@ def lat_lon_to_tile_coordinates(lat, lon, zoom):
     x_tile = int(n * ((lon + 180) / 360))
     y_tile = int(n * (1 - (math.log(math.tan(lat_rad) + 1 / math.cos(lat_rad)) / math.pi)) / 2)
     return x_tile, y_tile
-
-
