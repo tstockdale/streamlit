@@ -40,36 +40,41 @@ class TestLoggingConfig(unittest.TestCase):
         
         # Check that all required handlers exist
         self.assertIn('console', config['handlers'])
-        self.assertIn('file', config['handlers'])
-        self.assertIn('error_file', config['handlers'])
-        self.assertIn('api_file', config['handlers'])
-        self.assertIn('performance_file', config['handlers'])
+        self.assertIn('file_all', config['handlers'])  # Actual handler name
+        self.assertIn('file_error', config['handlers'])  # Actual handler name
+        self.assertIn('file_api', config['handlers'])  # Actual handler name
+        self.assertIn('file_performance', config['handlers'])  # Actual handler name
     
-    def test_get_logging_config_custom_log_dir(self):
+    @patch('src.weather_map.logging_config.Path.mkdir')
+    def test_get_logging_config_custom_log_dir(self, mock_mkdir):
         """Test getting logging configuration with custom log directory."""
         custom_dir = "/custom/logs"
         config = get_logging_config(custom_dir)
         
         # Check that file handlers use the custom directory
-        file_handler = config['handlers']['file']
+        file_handler = config['handlers']['file_all']  # Correct handler name
         self.assertTrue(file_handler['filename'].startswith(custom_dir))
         
-        error_handler = config['handlers']['error_file']
+        error_handler = config['handlers']['file_error']  # Correct handler name
         self.assertTrue(error_handler['filename'].startswith(custom_dir))
+        
+        # Verify mkdir was called
+        mock_mkdir.assert_called_once_with(exist_ok=True)
     
-    @patch('src.weather_map.logging_config.os.makedirs')
+    @patch('src.weather_map.logging_config.Path.mkdir')
     @patch('src.weather_map.logging_config.logging.config.dictConfig')
-    def test_setup_logging_default(self, mock_dict_config, mock_makedirs):
+    def test_setup_logging_default(self, mock_dict_config, mock_mkdir):
         """Test setting up logging with default parameters."""
         setup_logging()
         
-        mock_makedirs.assert_called_once_with("logs", exist_ok=True)
+        # The setup_logging function calls get_logging_config which calls Path.mkdir()
+        mock_mkdir.assert_called_once_with(exist_ok=True)
         mock_dict_config.assert_called_once()
     
     @patch.dict(os.environ, {'LOG_LEVEL': 'DEBUG'})
-    @patch('src.weather_map.logging_config.os.makedirs')
+    @patch('src.weather_map.logging_config.Path.mkdir')
     @patch('src.weather_map.logging_config.logging.config.dictConfig')
-    def test_setup_logging_with_env_log_level(self, mock_dict_config, mock_makedirs):
+    def test_setup_logging_with_env_log_level(self, mock_dict_config, mock_mkdir):
         """Test setting up logging with environment variable log level."""
         setup_logging()
         
@@ -79,8 +84,10 @@ class TestLoggingConfig(unittest.TestCase):
         # Get the config that was passed to dictConfig
         config_arg = mock_dict_config.call_args[0][0]
         
-        # Check that the root logger level is set to DEBUG
-        self.assertEqual(config_arg['root']['level'], 'DEBUG')
+        # Check that the root logger level is set to DEBUG (root logger uses empty string key)
+        self.assertEqual(config_arg['loggers']['']['level'], 'DEBUG')
+        # Also check that console handler level is set to DEBUG
+        self.assertEqual(config_arg['handlers']['console']['level'], 'DEBUG')
     
     def test_get_logger(self):
         """Test getting a logger instance."""
@@ -168,8 +175,13 @@ class TestLoggingConfig(unittest.TestCase):
         
         api_logger.log_response(status_code, response_time, response_size)
         
-        mock_logger.info.assert_called_once()
-        log_message = mock_logger.info.call_args[0][0]
+        # The method uses logger.log() with dynamic level, not info()
+        mock_logger.log.assert_called_once()
+        log_call_args = mock_logger.log.call_args
+        log_level = log_call_args[0][0]  # First positional arg is the level
+        log_message = log_call_args[0][1]  # Second positional arg is the message
+        
+        self.assertEqual(log_level, logging.INFO)  # 200 status should use INFO level
         self.assertIn("API Response", log_message)
         self.assertIn(str(status_code), log_message)
         self.assertIn(str(response_time), log_message)

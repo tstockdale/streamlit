@@ -19,6 +19,10 @@ from .utils import (
     meters_per_second_to_miles_per_hour,
     lat_lon_to_tile_coordinates
 )
+from .services import (
+    WeatherServiceFactory
+)
+
 from .logging_config import setup_logging, get_logger, PerformanceLogger
 
 # Constants
@@ -53,7 +57,9 @@ class WeatherApp:
     def _initialize_api_key(self) -> None:
         """Initialize API key from vault."""
         try:
-            self.api_key = services.get_api_key_from_vault(
+            self.logger.info("Attempting to retrieve API key from Vault.")
+            vault_service = WeatherServiceFactory.create_vault_service()
+            self.api_key = vault_service.get_api_key(
                 self.secret_path, self.secret_key, self.vault_url, self.vault_token
             )
             self.logger.info("API key retrieved successfully from Vault.")
@@ -239,11 +245,11 @@ class WeatherApp:
             row = {
                 "Time": unix_to_datetime(hour_data['dt'], timezone),
                 "Temp (°F)": (
-                    f"{celsius_to_fahrenheit(hour_data.get('temp')):.1f}" 
+                    celsius_to_fahrenheit(hour_data.get('temp')) 
                     if hour_data.get('temp') is not None else None
                 ),
                 "Feels Like (°F)": (
-                    f"{celsius_to_fahrenheit(hour_data.get('feels_like')):.1f}" 
+                    celsius_to_fahrenheit(hour_data.get('feels_like')) 
                     if hour_data.get('feels_like') is not None else None
                 ),
                 "One Hour Rain (mm)": (
@@ -251,7 +257,7 @@ class WeatherApp:
                 ),
                 "Humidity (%)": hour_data.get('humidity'),
                 "Wind Speed (mi/h)": (
-                    f"{wind_speed_mph:.1f}" if wind_speed_mph is not None else None
+                    wind_speed_mph if wind_speed_mph is not None else None
                 ),
                 "Description": (
                     hour_data.get('weather', [{}])[0].get('description', '').capitalize() 
@@ -260,7 +266,16 @@ class WeatherApp:
             }
             rows.append(row)
         
-        return pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
+        
+        # Convert NaN values back to None for specific columns where we want None instead of NaN
+        # This is important for test compatibility and cleaner data representation
+        # Use object dtype to preserve None values instead of converting to NaN
+        for col in ["One Hour Rain (mm)"]:
+            if col in df.columns:
+                df[col] = df[col].astype('object').where(pd.notna(df[col]), None)
+        
+        return df
     
     def render_ui(self) -> None:
         """Render the main user interface."""
@@ -283,7 +298,7 @@ class WeatherApp:
         
         # Main content area
         map_column, weather_column = st.columns(2)
-        
+
         # Process city input and display results
         if selected_city and selected_style:
             city_name, state_name, country_name = self.parse_city_input(selected_city)
@@ -324,7 +339,14 @@ class WeatherApp:
         with PerformanceLogger(f"process_city_weather_{city_name}", self.logger):
             # Get city coordinates
             with PerformanceLogger(f"get_coordinates_{city_name}", self.logger):
-                city_data = services.get_lat_lon(city_name, state_name, country_name, self.api_key)
+                geocoding_service = WeatherServiceFactory.create_geocoding_service()
+                city_data = geocoding_service.get_coordinates(
+                    city_name, 
+                    state_name, 
+                    country_name, 
+                    self.api_key,
+                    limit = 3
+                )
                 self.logger.info(f"Processing weather request for: {city_name}, {state_name}, {country_name}")
             
             if not city_data:
@@ -344,8 +366,13 @@ class WeatherApp:
             
             # Get and display weather data
             with PerformanceLogger(f"get_weather_data_{city_name}", self.logger):
-                weather_data = services.get_weather(lat, lon, self.api_key)
-            
+                weather_service = WeatherServiceFactory.create_weather_service()
+                weather_data = weather_service.get_weather_data(
+                    lat, 
+                    lon,
+                    self.api_key
+                )
+
             if not weather_data:
                 self.logger.error(f"Failed to retrieve weather data for {city_name}")
                 with weather_column:

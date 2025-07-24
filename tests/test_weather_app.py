@@ -8,7 +8,10 @@ class TestWeatherApp(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
-        with patch('src.weather_map.weather_app.services.get_api_key_from_vault'):
+        with patch('src.weather_map.weather_app.WeatherServiceFactory.create_vault_service') as mock_vault_factory:
+            mock_vault_service = MagicMock()
+            mock_vault_service.get_api_key.return_value = 'test_api_key'
+            mock_vault_factory.return_value = mock_vault_service
             self.app = WeatherApp()
             self.app.api_key = 'test_api_key'
     
@@ -147,22 +150,33 @@ class TestWeatherApp(unittest.TestCase):
         self.assertIsNone(result.iloc[0]['Feels Like (°F)'])
         self.assertEqual(result.iloc[0]['Humidity (%)'], 65)
     
-    @patch('src.weather_map.weather_app.services.get_lat_lon')
-    @patch('src.weather_map.weather_app.services.get_weather')
-    def test_process_city_weather_success(self, mock_get_weather, mock_get_lat_lon):
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_geocoding_service')
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_weather_service')
+    def test_process_city_weather_success(self, mock_weather_factory, mock_geocoding_factory):
         """Test successful city weather processing."""
-        # Mock the API responses
-        mock_get_lat_lon.return_value = [
+        # Mock the geocoding service
+        mock_geocoding_service = MagicMock()
+        mock_geocoding_service.get_coordinates.return_value = [
             {'name': 'New York', 'lat': 40.7128, 'lon': -74.0060, 'country': 'US'}
         ]
-        mock_get_weather.return_value = {
+        mock_geocoding_factory.return_value = mock_geocoding_service
+        
+        # Mock the weather service
+        mock_weather_service = MagicMock()
+        mock_weather_service.get_weather_data.return_value = {
             'current': {'temp': 20.5, 'humidity': 65},
             'timezone': 'America/New_York'
         }
+        mock_weather_factory.return_value = mock_weather_service
         
-        # Mock Streamlit columns
-        mock_map_column = Mock()
-        mock_weather_column = Mock()
+        # Mock Streamlit columns with context manager support
+        mock_map_column = MagicMock()
+        mock_map_column.__enter__ = MagicMock(return_value=mock_map_column)
+        mock_map_column.__exit__ = MagicMock(return_value=None)
+        
+        mock_weather_column = MagicMock()
+        mock_weather_column.__enter__ = MagicMock(return_value=mock_weather_column)
+        mock_weather_column.__exit__ = MagicMock(return_value=None)
         
         with patch.object(self.app, 'create_weather_map'), \
              patch.object(self.app, 'display_current_weather'):
@@ -175,16 +189,25 @@ class TestWeatherApp(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertIn('current', result)
         self.assertEqual(result['current']['temp'], 20.5)
-        mock_get_lat_lon.assert_called_once_with('New York', 'NY', 'US', 'test_api_key')
-        mock_get_weather.assert_called_once_with(40.7128, -74.0060, 'test_api_key')
+        mock_geocoding_service.get_coordinates.assert_called_once_with('New York', 'NY', 'US', 'test_api_key', limit=3)
+        mock_weather_service.get_weather_data.assert_called_once_with(40.7128, -74.0060, 'test_api_key')
     
-    @patch('src.weather_map.weather_app.services.get_lat_lon')
-    def test_process_city_weather_city_not_found(self, mock_get_lat_lon):
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_geocoding_service')
+    def test_process_city_weather_city_not_found(self, mock_geocoding_factory):
         """Test city weather processing when city is not found."""
-        mock_get_lat_lon.return_value = None
+        # Mock the geocoding service to return None (city not found)
+        mock_geocoding_service = MagicMock()
+        mock_geocoding_service.get_coordinates.return_value = None
+        mock_geocoding_factory.return_value = mock_geocoding_service
         
-        mock_map_column = Mock()
-        mock_weather_column = Mock()
+        # Mock Streamlit columns with context manager support
+        mock_map_column = MagicMock()
+        mock_map_column.__enter__ = MagicMock(return_value=mock_map_column)
+        mock_map_column.__exit__ = MagicMock(return_value=None)
+        
+        mock_weather_column = MagicMock()
+        mock_weather_column.__enter__ = MagicMock(return_value=mock_weather_column)
+        mock_weather_column.__exit__ = MagicMock(return_value=None)
         
         result = self.app._process_city_weather(
             'NonexistentCity', '', '', 'Streets',
@@ -192,18 +215,32 @@ class TestWeatherApp(unittest.TestCase):
         )
         
         self.assertIsNone(result)
+        mock_geocoding_service.get_coordinates.assert_called_once_with('NonexistentCity', '', '', 'test_api_key', limit=3)
     
-    @patch('src.weather_map.weather_app.services.get_lat_lon')
-    @patch('src.weather_map.weather_app.services.get_weather')
-    def test_process_city_weather_weather_api_failure(self, mock_get_weather, mock_get_lat_lon):
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_geocoding_service')
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_weather_service')
+    def test_process_city_weather_weather_api_failure(self, mock_weather_factory, mock_geocoding_factory):
         """Test city weather processing when weather API fails."""
-        mock_get_lat_lon.return_value = [
+        # Mock the geocoding service
+        mock_geocoding_service = MagicMock()
+        mock_geocoding_service.get_coordinates.return_value = [
             {'name': 'New York', 'lat': 40.7128, 'lon': -74.0060, 'country': 'US'}
         ]
-        mock_get_weather.return_value = None
+        mock_geocoding_factory.return_value = mock_geocoding_service
         
-        mock_map_column = Mock()
-        mock_weather_column = Mock()
+        # Mock the weather service to return None (API failure)
+        mock_weather_service = MagicMock()
+        mock_weather_service.get_weather_data.return_value = None
+        mock_weather_factory.return_value = mock_weather_service
+        
+        # Mock Streamlit columns with context manager support
+        mock_map_column = MagicMock()
+        mock_map_column.__enter__ = MagicMock(return_value=mock_map_column)
+        mock_map_column.__exit__ = MagicMock(return_value=None)
+        
+        mock_weather_column = MagicMock()
+        mock_weather_column.__enter__ = MagicMock(return_value=mock_weather_column)
+        mock_weather_column.__exit__ = MagicMock(return_value=None)
         
         with patch.object(self.app, 'create_weather_map'):
             result = self.app._process_city_weather(
@@ -212,33 +249,46 @@ class TestWeatherApp(unittest.TestCase):
             )
         
         self.assertIsNone(result)
+        mock_geocoding_service.get_coordinates.assert_called_once_with('New York', 'NY', 'US', 'test_api_key', limit=3)
+        mock_weather_service.get_weather_data.assert_called_once_with(40.7128, -74.0060, 'test_api_key')
 
 
 class TestWeatherAppIntegration(unittest.TestCase):
     """Integration tests for WeatherApp that test component interactions."""
     
-    @patch('src.weather_map.weather_app.services.get_api_key_from_vault')
-    def test_initialization_with_vault_success(self, mock_get_api_key):
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_vault_service')
+    def test_initialization_with_vault_success(self, mock_vault_factory):
         """Test WeatherApp initialization with successful Vault connection."""
-        mock_get_api_key.return_value = 'test_api_key_123'
+        mock_vault_service = MagicMock()
+        mock_vault_service.get_api_key.return_value = 'test_api_key_123'
+        mock_vault_factory.return_value = mock_vault_service
         
         app = WeatherApp()
         
         self.assertEqual(app.api_key, 'test_api_key_123')
-        mock_get_api_key.assert_called_once()
+        mock_vault_factory.assert_called_once()
+        mock_vault_service.get_api_key.assert_called_once()
     
-    @patch('src.weather_map.weather_app.services.get_api_key_from_vault')
-    def test_initialization_with_vault_failure(self, mock_get_api_key):
+    @patch('src.weather_map.weather_app.WeatherServiceFactory.create_vault_service')
+    def test_initialization_with_vault_failure(self, mock_vault_factory):
         """Test WeatherApp initialization with Vault connection failure."""
-        mock_get_api_key.side_effect = RuntimeError("Vault connection failed")
+        mock_vault_service = MagicMock()
+        mock_vault_service.get_api_key.side_effect = RuntimeError("Vault connection failed")
+        mock_vault_factory.return_value = mock_vault_service
         
         app = WeatherApp()
         
         self.assertIsNone(app.api_key)
+        mock_vault_factory.assert_called_once()
+        mock_vault_service.get_api_key.assert_called_once()
     
     def test_end_to_end_data_flow(self):
         """Test the complete data flow from input parsing to table creation."""
-        with patch('src.weather_map.weather_app.services.get_api_key_from_vault'):
+        with patch('src.weather_map.weather_app.WeatherServiceFactory.create_vault_service') as mock_vault_factory:
+            mock_vault_service = MagicMock()
+            mock_vault_service.get_api_key.return_value = 'test_api_key'
+            mock_vault_factory.return_value = mock_vault_service
+            
             app = WeatherApp()
             app.api_key = 'test_api_key'
         
