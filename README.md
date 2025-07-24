@@ -25,7 +25,11 @@ weather-map-app/
 │       └── utils.py            # Utility functions
 ├── tests/
 │   ├── __init__.py
-│   └── test_utils.py          # Unit tests for utility functions
+│   ├── test_utils.py          # Unit tests for utility functions
+│   ├── test_services.py       # Unit tests for API services and Vault integration
+│   ├── test_weather_app.py    # Unit tests for WeatherApp class and methods
+│   ├── test_logging_config.py # Unit tests for logging configuration and classes
+│   └── test_config.py         # Unit tests for configuration constants
 ├── docs/                      # Documentation directory
 │   └── logging_guide.md       # Comprehensive logging best practices guide
 ├── main.py                    # Application entry point

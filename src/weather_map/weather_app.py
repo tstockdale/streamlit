@@ -381,7 +381,7 @@ class WeatherApp:
             if hourly_df is not None and not hourly_df.empty:
                 # Display the table with full container width
                 st.dataframe(
-                    hourly_df.sort_values(by="Time", ascending=True).reset_index(drop=True),
+                    hourly_df.sort_values(by="Time", ascending=True),
                     use_container_width=True,
                     height=400  # Set a reasonable height for scrolling
                 )
