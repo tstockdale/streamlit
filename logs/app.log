@@ -3244,3 +3244,145 @@ requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://a
 2025-07-24 13:12:11 - src.weather_map.weather_app - CRITICAL - weather_app:_initialize_api_key:67 - Error retrieving API key: Vault connection failed
 2025-07-24 13:12:11 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:60 - Attempting to retrieve API key from Vault.
 2025-07-24 13:12:11 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:65 - API key retrieved successfully from Vault.
+2025-07-25 11:20:03 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:60 - Attempting to retrieve API key from Vault.
+2025-07-25 11:20:03 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: vault_api_key_retrieval
+2025-07-25 11:20:03 - src.weather_map.services - INFO - services:get_api_key:176 - Retrieving API key from Vault at path: openweathermap_api
+2025-07-25 11:20:03 - src.weather_map.services - INFO - services:get_api_key:191 - API key successfully retrieved from Vault
+2025-07-25 11:20:03 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: vault_api_key_retrieval in 0.007s
+2025-07-25 11:20:03 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:65 - API key retrieved successfully from Vault.
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:60 - Attempting to retrieve API key from Vault.
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: vault_api_key_retrieval
+2025-07-25 11:20:08 - src.weather_map.services - INFO - services:get_api_key:176 - Retrieving API key from Vault at path: openweathermap_api
+2025-07-25 11:20:08 - src.weather_map.services - INFO - services:get_api_key:191 - API key successfully retrieved from Vault
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: vault_api_key_retrieval in 0.005s
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:65 - API key retrieved successfully from Vault.
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_Hamburg
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_Hamburg
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: geocoding_Hamburg
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/geo/1.0/direct
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.152s
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: geocoding_Hamburg in 0.153s
+2025-07-25 11:20:08 - src.weather_map.services - INFO - services:get_coordinates:267 - Found 3 location(s) for query: Hamburg
+2025-07-25 11:20:08 - src.weather_map.services - DEBUG - services:get_coordinates:268 - Location data: [{'name': 'Hamburg', 'local_names': {'ar': 'هامبورغ', 'hu': 'Hamburg', 'xh': 'Hamburg', 'en': 'Hamburg', 'ie': 'Hamburg', 'mr': 'हांबुर्ग', 'fi': 'Hampuri', 'az': 'Hamburq', 'sk': 'Hamburg', 'ro': 'Hamburg', 'sr': 'Хамбург', 'vi': 'Hamburg', 'nn': 'Hamburg', 'qu': 'Hamburg', 'oc': 'Amborg', 'lv': 'Hamburga', 'ko': '함부르크', 'fr': 'Hambourg', 'sw': 'Hamburg', 'la': 'Hamburgum', 'jv': 'Hamburg', 'pt': 'Hamburgo', 'is': 'Hamborg', 'mi': 'Hamapaka', 'tr': 'Hamburg', 'no': 'Hamburg', 'ja': 'ハンブルク', 'sv': 'Hamburg', 'gd': 'Hamburg', 'io': 'Hamburg', 'bn': 'হামবুর্গ', 'bs': 'Hamburg', 'be': 'Гамбург', 'el': 'Αμβούργο', 'it': 'Amburgo', 'vo': 'Hamburg', 'rm': 'Hamburg', 'fa': 'هامبورگ', 'lb': 'Hamburg', 'sl': 'Hamburg', 'es': 'Hamburgo', 'sq': 'Hamburgu', 'th': 'ฮัมบูร์ก', 'he': 'המבורג', 'uk': 'Гамбурґ', 'br': 'Hamburg', 'de': 'Hamburg', 'yi': 'האמבורג', 'kn': 'ಹಾಂಬುರ್ಕ', 'lt': 'Hamburgas', 'ka': 'ჰამბურგი', 'id': 'Hamburg', 'fy': 'Hamboarch', 'ru': 'Гамбург', 'ur': 'ہم برک', 'da': 'Hamborg', 'an': 'Amburgo', 'pl': 'Hamburg', 'cy': 'Hamburg', 'af': 'Hamburg', 'zh': '汉堡', 'ca': "Ciutat d'Hamburg", 'mk': 'Хамбург', 'cs': 'Hamburk', 'et': 'Hamburg', 'ku': 'Hamburg', 'bg': 'Хамбург', 'eu': 'Hanburg hiria', 'hr': 'Hamburg', 'ga': 'Hamburg', 'gl': 'Hamburgo', 'nl': 'Hamburg', 'hy': 'Համբուրգ', 'eo': 'Hamburgo'}, 'lat': 53.550341, 'lon': 10.000654, 'country': 'DE'}, {'name': 'Hamburg', 'lat': 40.604446, 'lon': -95.657771, 'country': 'US', 'state': 'Iowa'}, {'name': 'Hamburg', 'local_names': {'ru': 'Хамберг', 'en': 'Hamburg'}, 'lat': 44.7332953, 'lon': -93.9671917, 'country': 'US', 'state': 'Minnesota'}]
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:350 - Processing weather request for: Hamburg, , 
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_Hamburg in 0.155s
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:360 - Using coordinates: (53.550341, 10.000654) for Hamburg
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_map_Hamburg
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_map_Hamburg in 0.024s
+2025-07-25 11:20:08 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_weather_data_Hamburg
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: weather_53.550341_10.000654
+2025-07-25 11:20:08 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/data/3.0/onecall
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.062s
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: weather_53.550341_10.000654 in 0.063s
+2025-07-25 11:20:09 - src.weather_map.services - INFO - services:get_weather_data:351 - Successfully retrieved weather data for coordinates (53.550341, 10.000654)
+2025-07-25 11:20:09 - src.weather_map.services - DEBUG - services:get_weather_data:352 - Weather data keys: ['lat', 'lon', 'timezone', 'timezone_offset', 'current', 'hourly', 'daily']
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_weather_data_Hamburg in 0.063s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:382 - Successfully processed weather data for Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: display_current_weather_Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: display_current_weather_Hamburg in 0.018s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: process_city_weather_Hamburg in 0.264s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_hourly_forecast_Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_render_hourly_forecast_section:415 - Displayed hourly forecast with 48 entries
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_hourly_forecast_Hamburg in 0.006s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:60 - Attempting to retrieve API key from Vault.
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: vault_api_key_retrieval
+2025-07-25 11:20:09 - src.weather_map.services - INFO - services:get_api_key:176 - Retrieving API key from Vault at path: openweathermap_api
+2025-07-25 11:20:09 - src.weather_map.services - INFO - services:get_api_key:191 - API key successfully retrieved from Vault
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: vault_api_key_retrieval in 0.002s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:65 - API key retrieved successfully from Vault.
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_Hamburg
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: geocoding_Hamburg
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/geo/1.0/direct
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.037s
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: geocoding_Hamburg in 0.038s
+2025-07-25 11:20:09 - src.weather_map.services - INFO - services:get_coordinates:267 - Found 3 location(s) for query: Hamburg
+2025-07-25 11:20:09 - src.weather_map.services - DEBUG - services:get_coordinates:268 - Location data: [{'name': 'Hamburg', 'local_names': {'ar': 'هامبورغ', 'hu': 'Hamburg', 'xh': 'Hamburg', 'en': 'Hamburg', 'ie': 'Hamburg', 'mr': 'हांबुर्ग', 'fi': 'Hampuri', 'az': 'Hamburq', 'sk': 'Hamburg', 'ro': 'Hamburg', 'sr': 'Хамбург', 'vi': 'Hamburg', 'nn': 'Hamburg', 'qu': 'Hamburg', 'oc': 'Amborg', 'lv': 'Hamburga', 'ko': '함부르크', 'fr': 'Hambourg', 'sw': 'Hamburg', 'la': 'Hamburgum', 'jv': 'Hamburg', 'pt': 'Hamburgo', 'is': 'Hamborg', 'mi': 'Hamapaka', 'tr': 'Hamburg', 'no': 'Hamburg', 'ja': 'ハンブルク', 'sv': 'Hamburg', 'gd': 'Hamburg', 'io': 'Hamburg', 'bn': 'হামবুর্গ', 'bs': 'Hamburg', 'be': 'Гамбург', 'el': 'Αμβούργο', 'it': 'Amburgo', 'vo': 'Hamburg', 'rm': 'Hamburg', 'fa': 'هامبورگ', 'lb': 'Hamburg', 'sl': 'Hamburg', 'es': 'Hamburgo', 'sq': 'Hamburgu', 'th': 'ฮัมบูร์ก', 'he': 'המבורג', 'uk': 'Гамбурґ', 'br': 'Hamburg', 'de': 'Hamburg', 'yi': 'האמבורג', 'kn': 'ಹಾಂಬುರ್ಕ', 'lt': 'Hamburgas', 'ka': 'ჰამბურგი', 'id': 'Hamburg', 'fy': 'Hamboarch', 'ru': 'Гамбург', 'ur': 'ہم برک', 'da': 'Hamborg', 'an': 'Amburgo', 'pl': 'Hamburg', 'cy': 'Hamburg', 'af': 'Hamburg', 'zh': '汉堡', 'ca': "Ciutat d'Hamburg", 'mk': 'Хамбург', 'cs': 'Hamburk', 'et': 'Hamburg', 'ku': 'Hamburg', 'bg': 'Хамбург', 'eu': 'Hanburg hiria', 'hr': 'Hamburg', 'ga': 'Hamburg', 'gl': 'Hamburgo', 'nl': 'Hamburg', 'hy': 'Համբուրգ', 'eo': 'Hamburgo'}, 'lat': 53.550341, 'lon': 10.000654, 'country': 'DE'}, {'name': 'Hamburg', 'lat': 40.604446, 'lon': -95.657771, 'country': 'US', 'state': 'Iowa'}, {'name': 'Hamburg', 'local_names': {'ru': 'Хамберг', 'en': 'Hamburg'}, 'lat': 44.7332953, 'lon': -93.9671917, 'country': 'US', 'state': 'Minnesota'}]
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:350 - Processing weather request for: Hamburg, , 
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_Hamburg in 0.038s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:360 - Using coordinates: (53.550341, 10.000654) for Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_map_Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_map_Hamburg in 0.006s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_weather_data_Hamburg
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: weather_53.550341_10.000654
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/data/3.0/onecall
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.039s
+2025-07-25 11:20:09 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: weather_53.550341_10.000654 in 0.039s
+2025-07-25 11:20:09 - src.weather_map.services - INFO - services:get_weather_data:351 - Successfully retrieved weather data for coordinates (53.550341, 10.000654)
+2025-07-25 11:20:09 - src.weather_map.services - DEBUG - services:get_weather_data:352 - Weather data keys: ['lat', 'lon', 'timezone', 'timezone_offset', 'current', 'hourly', 'daily']
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_weather_data_Hamburg in 0.040s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:382 - Successfully processed weather data for Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: display_current_weather_Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: display_current_weather_Hamburg in 0.001s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: process_city_weather_Hamburg in 0.087s
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_hourly_forecast_Hamburg
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - weather_app:_render_hourly_forecast_section:415 - Displayed hourly forecast with 48 entries
+2025-07-25 11:20:09 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_hourly_forecast_Hamburg in 0.003s
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:60 - Attempting to retrieve API key from Vault.
+2025-07-25 11:20:18 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: vault_api_key_retrieval
+2025-07-25 11:20:18 - src.weather_map.services - INFO - services:get_api_key:176 - Retrieving API key from Vault at path: openweathermap_api
+2025-07-25 11:20:18 - src.weather_map.services - INFO - services:get_api_key:191 - API key successfully retrieved from Vault
+2025-07-25 11:20:18 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: vault_api_key_retrieval in 0.006s
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:65 - API key retrieved successfully from Vault.
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_New York
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_New York
+2025-07-25 11:20:18 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: geocoding_New York
+2025-07-25 11:20:18 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/geo/1.0/direct
+2025-07-25 11:20:18 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.125s
+2025-07-25 11:20:18 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: geocoding_New York in 0.126s
+2025-07-25 11:20:18 - src.weather_map.services - INFO - services:get_coordinates:267 - Found 3 location(s) for query: New York
+2025-07-25 11:20:18 - src.weather_map.services - DEBUG - services:get_coordinates:268 - Location data: [{'name': 'New York', 'local_names': {'az': 'Nyu-York', 'fr': 'New York', 'gl': 'Nova York', 'uk': 'Нью-Йорк', 'pa': 'ਨਿਊਯਾਰਕ', 'ja': 'ニューヨーク', 'be': 'Нью-Ёрк', 'ko': '뉴욕', 'mi': 'Niu Iaka', 'tr': 'New York', 'el': 'Νέα Υόρκη', 'es': 'Nueva York', 'hr': 'New York', 'cy': 'Efrog Newydd', 'tt': 'Ниюрык', 'de': 'New York', 'sr': 'Њујорк', 'pt': 'Nova Iorque', 'fa': 'نیویورک', 'br': 'New York', 'he': 'ניו יורק', 'pl': 'Nowy Jork', 'vi': 'New York', 'ur': 'نیو یارک', 'ga': 'Nua-Eabhrac', 'kn': 'ನ್ಯೂಯೊರ್ಕ್', 'bn': 'নিউ ইয়র্ক', 'zh': '纽约', 'eo': 'Novjorko', 'cs': 'New York', 'en': 'New York', 'is': 'Nýja Jórvík', 'oc': 'Nòva York', 'no': 'New York', 'te': 'న్యూయొర్క్', 'it': 'New York', 'eu': 'New York', 'ru': 'Нью-Йорк', 'ar': 'نيويورك', 'ca': 'Nova York', 'hi': 'न्यूयॊर्क्'}, 'lat': 40.7127281, 'lon': -74.0060152, 'country': 'US', 'state': 'New York'}, {'name': 'New Lenox', 'local_names': {'en': 'New Lenox'}, 'lat': 41.5119761, 'lon': -87.9656098, 'country': 'US', 'state': 'Illinois'}, {'name': 'New York', 'local_names': {'ta': 'நியூ யோர்க்', 'en': 'New York'}, 'lat': 55.0252998, 'lon': -1.4869496, 'country': 'GB', 'state': 'England'}]
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:350 - Processing weather request for: New York, , 
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_New York in 0.128s
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:360 - Using coordinates: (40.7127281, -74.0060152) for New York
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_map_New York
+2025-07-25 11:20:18 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_map_New York in 0.024s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_weather_data_New York
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: weather_40.7127281_-74.0060152
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/data/3.0/onecall
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.068s
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: weather_40.7127281_-74.0060152 in 0.069s
+2025-07-25 11:20:19 - src.weather_map.services - INFO - services:get_weather_data:351 - Successfully retrieved weather data for coordinates (40.7127281, -74.0060152)
+2025-07-25 11:20:19 - src.weather_map.services - DEBUG - services:get_weather_data:352 - Weather data keys: ['lat', 'lon', 'timezone', 'timezone_offset', 'current', 'hourly', 'daily']
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_weather_data_New York in 0.071s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:382 - Successfully processed weather data for New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: display_current_weather_New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: display_current_weather_New York in 0.005s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: process_city_weather_New York in 0.232s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_hourly_forecast_New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_render_hourly_forecast_section:415 - Displayed hourly forecast with 48 entries
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_hourly_forecast_New York in 0.005s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:60 - Attempting to retrieve API key from Vault.
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: vault_api_key_retrieval
+2025-07-25 11:20:19 - src.weather_map.services - INFO - services:get_api_key:176 - Retrieving API key from Vault at path: openweathermap_api
+2025-07-25 11:20:19 - src.weather_map.services - INFO - services:get_api_key:191 - API key successfully retrieved from Vault
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: vault_api_key_retrieval in 0.002s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_initialize_api_key:65 - API key retrieved successfully from Vault.
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: process_city_weather_New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_coordinates_New York
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: geocoding_New York
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/geo/1.0/direct
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.033s
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: geocoding_New York in 0.034s
+2025-07-25 11:20:19 - src.weather_map.services - INFO - services:get_coordinates:267 - Found 3 location(s) for query: New York
+2025-07-25 11:20:19 - src.weather_map.services - DEBUG - services:get_coordinates:268 - Location data: [{'name': 'New York', 'local_names': {'az': 'Nyu-York', 'fr': 'New York', 'gl': 'Nova York', 'uk': 'Нью-Йорк', 'pa': 'ਨਿਊਯਾਰਕ', 'ja': 'ニューヨーク', 'be': 'Нью-Ёрк', 'ko': '뉴욕', 'mi': 'Niu Iaka', 'tr': 'New York', 'el': 'Νέα Υόρκη', 'es': 'Nueva York', 'hr': 'New York', 'cy': 'Efrog Newydd', 'tt': 'Ниюрык', 'de': 'New York', 'sr': 'Њујорк', 'pt': 'Nova Iorque', 'fa': 'نیویورک', 'br': 'New York', 'he': 'ניו יורק', 'pl': 'Nowy Jork', 'vi': 'New York', 'ur': 'نیو یارک', 'ga': 'Nua-Eabhrac', 'kn': 'ನ್ಯೂಯೊರ್ಕ್', 'bn': 'নিউ ইয়র্ক', 'zh': '纽约', 'eo': 'Novjorko', 'cs': 'New York', 'en': 'New York', 'is': 'Nýja Jórvík', 'oc': 'Nòva York', 'no': 'New York', 'te': 'న్యూయొర్క్', 'it': 'New York', 'eu': 'New York', 'ru': 'Нью-Йорк', 'ar': 'نيويورك', 'ca': 'Nova York', 'hi': 'न्यूयॊर्क्'}, 'lat': 40.7127281, 'lon': -74.0060152, 'country': 'US', 'state': 'New York'}, {'name': 'New Lenox', 'local_names': {'en': 'New Lenox'}, 'lat': 41.5119761, 'lon': -87.9656098, 'country': 'US', 'state': 'Illinois'}, {'name': 'New York', 'local_names': {'ta': 'நியூ யோர்க்', 'en': 'New York'}, 'lat': 55.0252998, 'lon': -1.4869496, 'country': 'GB', 'state': 'England'}]
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:350 - Processing weather request for: New York, , 
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_coordinates_New York in 0.034s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:360 - Using coordinates: (40.7127281, -74.0060152) for New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_map_New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_map_New York in 0.006s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: get_weather_data_New York
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__enter__:194 - Starting operation: weather_40.7127281_-74.0060152
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:log_request:222 - API Request: GET https://api.openweathermap.org/data/3.0/onecall
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:log_response:233 - API Response: 200 in 0.039s
+2025-07-25 11:20:19 - src.weather_map.services - INFO - logging_config:__exit__:203 - Completed operation: weather_40.7127281_-74.0060152 in 0.039s
+2025-07-25 11:20:19 - src.weather_map.services - INFO - services:get_weather_data:351 - Successfully retrieved weather data for coordinates (40.7127281, -74.0060152)
+2025-07-25 11:20:19 - src.weather_map.services - DEBUG - services:get_weather_data:352 - Weather data keys: ['lat', 'lon', 'timezone', 'timezone_offset', 'current', 'hourly', 'daily']
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: get_weather_data_New York in 0.040s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_process_city_weather:382 - Successfully processed weather data for New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: display_current_weather_New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: display_current_weather_New York in 0.001s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: process_city_weather_New York in 0.083s
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__enter__:194 - Starting operation: create_hourly_forecast_New York
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - weather_app:_render_hourly_forecast_section:415 - Displayed hourly forecast with 48 entries
+2025-07-25 11:20:19 - src.weather_map.weather_app - INFO - logging_config:__exit__:203 - Completed operation: create_hourly_forecast_New York in 0.002s
