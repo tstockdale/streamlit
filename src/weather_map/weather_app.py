@@ -29,6 +29,15 @@ DEFAULT_ZOOM_LEVEL = 10
 MAP_WIDTH = 350
 MAP_HEIGHT = 500
 
+# Available weather layers
+WEATHER_LAYERS = {
+    'precipitation_new': 'Precipitation',
+    'temp_new': 'Temperature',
+    'clouds_new': 'Clouds',
+    'wind_new': 'Wind Speed',
+    'pressure_new': 'Pressure'
+}
+
 
 class WeatherApp:
     """Main weather application class."""
@@ -110,34 +119,48 @@ class WeatherApp:
         else:
             return '', '', ''
     
-    def create_weather_map(self, lat: float, lon: float, weather_layer: str = 'precipitation_new') -> None:
+    def create_weather_map(
+        self, 
+        lat: float, 
+        lon: float, 
+        weather_layer: str = 'precipitation_new',
+        zoom_level: int = DEFAULT_ZOOM_LEVEL
+    ) -> None:
         """
-        Create and display a Folium weather map.
+        Create and display a Folium weather map with weather overlay.
         
         Args:
             lat: Latitude coordinate
             lon: Longitude coordinate
             weather_layer: Weather layer type to display
+            zoom_level: Initial zoom level for the map
         """
         if not self.api_key:
             st.error("API key is required to fetch weather map tiles.")
             return
         
-        zoom_level = DEFAULT_ZOOM_LEVEL
-        x, y = lat_lon_to_tile_coordinates(lat, lon, zoom_level)
-        tile_url = f"http://tile.openweathermap.org/map/{weather_layer}/{zoom_level}/{x}/{y}.png?appid={self.api_key}"
+        # Create tile layer URL template for dynamic loading at all zoom levels
+        tile_url_template = f"http://tile.openweathermap.org/map/{weather_layer}/{{z}}/{{x}}/{{y}}.png?appid={self.api_key}"
         
-        self.logger.debug(f"Weather tile URL: {tile_url}")
+        self.logger.debug(f"Weather tile URL template: {tile_url_template}")
         
+        # Create the base map
         folium_map = folium.Map(location=[lat, lon], zoom_start=zoom_level)
+        
+        # Add the weather layer as an overlay
+        weather_layer_name = WEATHER_LAYERS.get(weather_layer, weather_layer.replace('_', ' ').title())
         folium.TileLayer(
-            tiles=tile_url,
+            tiles=tile_url_template,
             attr='OpenWeatherMap',
-            name=weather_layer,
+            name=weather_layer_name,
             overlay=True,
             control=True
         ).add_to(folium_map)
+        
+        # Add layer control to allow toggling the weather overlay
         folium_map.add_child(folium.LayerControl())
+        
+        # Display the map
         st_folium(folium_map, width=MAP_WIDTH, height=MAP_HEIGHT)
     
     def format_city_info_string(self, city_data: Dict[str, Any]) -> str:
@@ -300,10 +323,21 @@ class WeatherApp:
         st.title('World Cities Weather Map')
         
         # Input controls
-        selected_city = st.text_input(
-            'Enter a city 👇', 
-            placeholder='[city], [state code or ""], [country code or ""]'
-        )
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            selected_city = st.text_input(
+                'Enter a city 👇', 
+                placeholder='[city], [state code or ""], [country code or ""]'
+            )
+        
+        with col2:
+            selected_weather_layer = st.selectbox(
+                'Weather Layer',
+                options=list(WEATHER_LAYERS.keys()),
+                format_func=lambda x: WEATHER_LAYERS[x],
+                index=0  # Default to precipitation
+            )
         
         # Main content area
         map_column, weather_column = st.columns(2)
@@ -315,7 +349,8 @@ class WeatherApp:
             if city_name:  # Only proceed if we have at least a city name
                 weather_data = self._process_city_weather(
                     city_name, state_name, country_name, 
-                    map_column, weather_column
+                    map_column, weather_column,
+                    selected_weather_layer
                 )
                 
                 # Display hourly forecast in a separate full-width section
@@ -328,7 +363,8 @@ class WeatherApp:
         state_name: str, 
         country_name: str,
         map_column,
-        weather_column
+        weather_column,
+        weather_layer: str = 'precipitation_new'
     ) -> Optional[Dict[str, Any]]:
         """
         Process city weather data and display results.
@@ -339,6 +375,7 @@ class WeatherApp:
             country_name: Country name
             map_column: Streamlit column for map
             weather_column: Streamlit column for weather info
+            weather_layer: Weather layer type to display on map
             
         Returns:
             Weather data dictionary or None if processing failed
@@ -369,7 +406,7 @@ class WeatherApp:
             # Display map
             with PerformanceLogger(f"create_map_{city_name}", self.logger):
                 with map_column:
-                    self.create_weather_map(lat, lon)
+                    self.create_weather_map(lat, lon, weather_layer)
             
             # Get and display weather data
             with PerformanceLogger(f"get_weather_data_{city_name}", self.logger):
@@ -397,7 +434,7 @@ class WeatherApp:
     
     def _render_hourly_forecast_section(self, weather_data: Dict[str, Any], city_name: str) -> None:
         """
-        Render the hourly forecast section in a separate full-width component.
+        Render the hourly forecast section in a separate full-width column.
         
         Args:
             weather_data: Weather data from API
@@ -408,20 +445,25 @@ class WeatherApp:
             
         # Create a separator and section header
         st.markdown("---")
-        st.subheader("📊 Hourly Forecast")
         
-        with PerformanceLogger(f"create_hourly_forecast_{city_name}", self.logger):
-            hourly_df = self.create_hourly_forecast_table(weather_data)
-            if hourly_df is not None and not hourly_df.empty:
-                # Display the table with full container width
-                st.dataframe(
-                    hourly_df.sort_values(by="Time", ascending=True),
-                    use_container_width=True,
-                    height=400  # Set a reasonable height for scrolling
-                )
-                self.logger.info(f"Displayed hourly forecast with {len(hourly_df)} entries")
-            else:
-                st.info("No hourly forecast data available.")
+        # Create a single full-width column for the hourly forecast
+        forecast_column = st.columns(1)[0]
+        
+        with forecast_column:
+            st.subheader("📊 Hourly Forecast")
+            
+            with PerformanceLogger(f"create_hourly_forecast_{city_name}", self.logger):
+                hourly_df = self.create_hourly_forecast_table(weather_data)
+                if hourly_df is not None and not hourly_df.empty:
+                    # Display the table with full container width
+                    st.dataframe(
+                        hourly_df.sort_values(by="Time", ascending=True),
+                        use_container_width=True,
+                        height=400  # Set a reasonable height for scrolling
+                    )
+                    self.logger.info(f"Displayed hourly forecast with {len(hourly_df)} entries")
+                else:
+                    st.info("No hourly forecast data available.")
     
     def run(self) -> None:
         """Run the weather application."""
