@@ -6,7 +6,7 @@ import logging
 import logging.config
 import os
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 def get_logging_config(log_dir: str = "logs") -> Dict[str, Any]:
@@ -132,7 +132,7 @@ def get_logging_config(log_dir: str = "logs") -> Dict[str, Any]:
     }
 
 
-def setup_logging(log_level: str = None, log_dir: str = "logs") -> None:
+def setup_logging(log_level: Optional[str] = None, log_dir: str = "logs") -> None:
     """
     Setup logging configuration for the application.
     
@@ -175,7 +175,7 @@ def get_logger(name: str) -> logging.Logger:
 class PerformanceLogger:
     """Context manager for performance logging."""
     
-    def __init__(self, operation: str, logger: logging.Logger = None):
+    def __init__(self, operation: str, logger: Optional[logging.Logger] = None):
         """
         Initialize performance logger.
         
@@ -208,7 +208,7 @@ class PerformanceLogger:
 class APILogger:
     """Specialized logger for API calls."""
     
-    def __init__(self, logger: logging.Logger = None):
+    def __init__(self, logger: Optional[logging.Logger] = None):
         """
         Initialize API logger.
         
@@ -217,7 +217,7 @@ class APILogger:
         """
         self.logger = logger or get_logger('src.weather_map.services')
     
-    def log_request(self, method: str, url: str, params: dict = None, headers: dict = None):
+    def log_request(self, method: str, url: str, params: Optional[dict] = None, headers: Optional[dict] = None):
         """Log API request details."""
         self.logger.info(f"API Request: {method} {url}", extra={
             'method': method,
@@ -227,7 +227,7 @@ class APILogger:
                        for k, v in (headers or {}).items()}
         })
     
-    def log_response(self, status_code: int, response_time: float, response_size: int = None):
+    def log_response(self, status_code: int, response_time: float, response_size: Optional[int] = None):
         """Log API response details."""
         level = logging.INFO if 200 <= status_code < 400 else logging.WARNING
         self.logger.log(level, f"API Response: {status_code} in {response_time:.3f}s", extra={
@@ -236,7 +236,7 @@ class APILogger:
             'response_size': response_size
         })
     
-    def log_error(self, error: Exception, context: dict = None):
+    def log_error(self, error: Exception, context: Optional[dict] = None):
         """Log API error details."""
         self.logger.error(f"API Error: {error}", extra={
             'error_type': type(error).__name__,

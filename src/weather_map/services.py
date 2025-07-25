@@ -9,8 +9,8 @@ This module provides services for interacting with external APIs including:
 The module is designed with proper error handling, logging, and performance monitoring.
 """
 
-import requests
-import hvac
+import requests # type: ignore
+import hvac  # type: ignore
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -56,7 +56,7 @@ class WeatherError(APIError):
 class BaseAPIService(ABC):
     """Base class for API services with common functionality."""
     
-    def __init__(self, config: APIConfig = None):
+    def __init__(self, config: Optional[APIConfig] = None):
         """
         Initialize the base API service.
         
@@ -71,9 +71,9 @@ class BaseAPIService(ABC):
         self, 
         method: str, 
         url: str, 
-        params: Dict[str, Any] = None,
-        timeout: int = None,
-        operation_name: str = None
+        params: Optional[Dict[str, Any]] = None,
+        timeout: Optional[int] = None,
+        operation_name: Optional[str] = None
     ) -> Optional[requests.Response]:
         """
         Make an HTTP request with proper logging and error handling.
@@ -290,7 +290,7 @@ class WeatherService(BaseAPIService):
         longitude: float, 
         api_key: str,
         units: str = "metric",
-        exclude: List[str] = None
+        exclude: Optional[List[str]] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Get weather data for given coordinates.
@@ -372,13 +372,11 @@ class WeatherServiceFactory:
         return VaultService()
     
     @staticmethod
-    def create_geocoding_service(config: APIConfig = None) -> GeocodingService:
+    def create_geocoding_service(config: Optional[APIConfig] = None) -> GeocodingService:
         """Create a geocoding service instance."""
-        return GeocodingService(config)
+        return GeocodingService(config or APIConfig())
     
     @staticmethod
-    def create_weather_service(config: APIConfig = None) -> WeatherService:
+    def create_weather_service(config: Optional[APIConfig] = None) -> WeatherService:
         """Create a weather service instance."""
-        return WeatherService(config)
-
-
+        return WeatherService(config or APIConfig())

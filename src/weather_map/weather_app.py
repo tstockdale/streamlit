@@ -7,7 +7,7 @@ import os
 import pandas as pd
 from dotenv import load_dotenv
 import folium
-from streamlit_folium import st_folium
+from streamlit_folium import st_folium # type: ignore
 from typing import Optional, Dict, Any, Tuple
 
 from .config import MAP_STYLES
@@ -57,8 +57,27 @@ class WeatherApp:
     def _initialize_api_key(self) -> None:
         """Initialize API key from vault."""
         try:
+            # Validate that all required environment variables are present
+            if (self.secret_path is None or self.secret_key is None or 
+                self.vault_url is None or self.vault_token is None):
+                missing_vars = []
+                if self.secret_path is None:
+                    missing_vars.append("SECRET_PATH")
+                if self.secret_key is None:
+                    missing_vars.append("SECRET_KEY")
+                if self.vault_url is None:
+                    missing_vars.append("VAULT_URL")
+                if self.vault_token is None:
+                    missing_vars.append("VAULT_TOKEN")
+                
+                error_msg = f"Missing required environment variables: {', '.join(missing_vars)}"
+                self.logger.critical(error_msg)
+                raise RuntimeError(error_msg)
+            
+            # At this point, mypy knows all variables are not None
             self.logger.info("Attempting to retrieve API key from Vault.")
             vault_service = WeatherServiceFactory.create_vault_service()
+            
             self.api_key = vault_service.get_api_key(
                 self.secret_path, self.secret_key, self.vault_url, self.vault_token
             )
