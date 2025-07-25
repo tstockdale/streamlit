@@ -156,6 +156,7 @@ class WeatherApp:
             overlay=True,
             control=True
         ).add_to(folium_map)
+        self.logger.info(f"Added weather layer '{weather_layer_name}' to map at zoom level {zoom_level}")
         
         # Add layer control to allow toggling the weather overlay
         folium_map.add_child(folium.LayerControl())
