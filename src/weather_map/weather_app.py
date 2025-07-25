@@ -10,7 +10,6 @@ import folium
 from streamlit_folium import st_folium # type: ignore
 from typing import Optional, Dict, Any, Tuple
 
-from .config import MAP_STYLES
 from . import services
 from .utils import (
     unix_to_datetime,
@@ -301,31 +300,22 @@ class WeatherApp:
         st.title('World Cities Weather Map')
         
         # Input controls
-        city_input_column, map_style_column = st.columns(2)
-        
-        with city_input_column:
-            selected_city = st.text_input(
-                'Enter a city 👇', 
-                placeholder='[city], [state code or ""], [country code or ""]'
-            )
-        
-        with map_style_column:
-            selected_style = st.selectbox(
-                "Select Map Style 👇", 
-                options=list(MAP_STYLES.keys())
-            )
+        selected_city = st.text_input(
+            'Enter a city 👇', 
+            placeholder='[city], [state code or ""], [country code or ""]'
+        )
         
         # Main content area
         map_column, weather_column = st.columns(2)
 
         # Process city input and display results
-        if selected_city and selected_style:
+        if selected_city:
             city_name, state_name, country_name = self.parse_city_input(selected_city)
             
             if city_name:  # Only proceed if we have at least a city name
                 weather_data = self._process_city_weather(
                     city_name, state_name, country_name, 
-                    selected_style, map_column, weather_column
+                    map_column, weather_column
                 )
                 
                 # Display hourly forecast in a separate full-width section
@@ -337,7 +327,6 @@ class WeatherApp:
         city_name: str, 
         state_name: str, 
         country_name: str,
-        selected_style: str,
         map_column,
         weather_column
     ) -> Optional[Dict[str, Any]]:
@@ -348,7 +337,6 @@ class WeatherApp:
             city_name: Name of the city
             state_name: State/province name
             country_name: Country name
-            selected_style: Selected map style
             map_column: Streamlit column for map
             weather_column: Streamlit column for weather info
             

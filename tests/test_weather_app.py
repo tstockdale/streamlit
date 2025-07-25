@@ -182,7 +182,7 @@ class TestWeatherApp(unittest.TestCase):
              patch.object(self.app, 'display_current_weather'):
             
             result = self.app._process_city_weather(
-                'New York', 'NY', 'US', 'Streets', 
+                'New York', 'NY', 'US', 
                 mock_map_column, mock_weather_column
             )
         
@@ -210,7 +210,7 @@ class TestWeatherApp(unittest.TestCase):
         mock_weather_column.__exit__ = MagicMock(return_value=None)
         
         result = self.app._process_city_weather(
-            'NonexistentCity', '', '', 'Streets',
+            'NonexistentCity', '', '',
             mock_map_column, mock_weather_column
         )
         
@@ -244,7 +244,7 @@ class TestWeatherApp(unittest.TestCase):
         
         with patch.object(self.app, 'create_weather_map'):
             result = self.app._process_city_weather(
-                'New York', 'NY', 'US', 'Streets',
+                'New York', 'NY', 'US',
                 mock_map_column, mock_weather_column
             )
         
