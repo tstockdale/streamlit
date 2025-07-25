@@ -12,6 +12,8 @@ The module is designed with proper error handling, logging, and performance moni
 import requests # type: ignore
 import hvac  # type: ignore
 import time
+import toml  # type: ignore
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional, Dict, Any, List, Union
@@ -156,7 +158,7 @@ class VaultService:
         vault_token: str
     ) -> str:
         """
-        Retrieve an API key from HashiCorp Vault.
+        Retrieve an API key from HashiCorp Vault with fallback to Streamlit secrets.
 
         Args:
             secret_path: The path to the secret in Vault
@@ -168,10 +170,11 @@ class VaultService:
             The API key if found
             
         Raises:
-            RuntimeError: If unable to retrieve the API key
-            ValueError: If the key is not found in the secret
+            RuntimeError: If unable to retrieve the API key from either source
+            ValueError: If the key is not found in either source
         """
         with PerformanceLogger("vault_api_key_retrieval", self.logger):
+            # First, try to retrieve from Vault
             try:
                 self.logger.info(f"Retrieving API key from Vault at path: {secret_path}")
                 
@@ -191,17 +194,37 @@ class VaultService:
                     self.logger.info("API key successfully retrieved from Vault")
                     return api_key
                 else:
-                    error_msg = f"Key '{secret_key}' not found in Vault secret at path '{secret_path}'"
-                    self.logger.critical(error_msg)
-                    raise ValueError(error_msg)
+                    self.logger.warning(f"Key '{secret_key}' not found in Vault secret at path '{secret_path}', trying fallback")
 
-            except ValueError:
-                # Re-raise ValueError as-is for backward compatibility
-                raise
             except Exception as e:
-                error_msg = f"Failed to retrieve API key from Vault: {e}"
-                self.logger.error(error_msg, exc_info=True)
-                raise RuntimeError(error_msg)
+                self.logger.warning(f"Failed to retrieve API key from Vault: {e}, trying fallback")
+
+            # Fallback: try to read from Streamlit secrets file
+            try:
+                self.logger.info("Attempting to retrieve API key from Streamlit secrets file")
+                secrets_path = ".streamlit/secrets.toml"
+                
+                if os.path.exists(secrets_path):
+                    with open(secrets_path, 'r') as f:
+                        secrets_data = toml.load(f)
+                    
+                    api_key = secrets_data.get('SECRET_KEY_VALUE')
+                    
+                    if api_key:
+                        self.logger.info("API key successfully retrieved from Streamlit secrets file")
+                        return api_key
+                    else:
+                        self.logger.error("SECRET_KEY_VALUE not found in Streamlit secrets file")
+                else:
+                    self.logger.error(f"Streamlit secrets file not found at: {secrets_path}")
+                    
+            except Exception as e:
+                self.logger.error(f"Failed to read from Streamlit secrets file: {e}")
+
+            # If both methods fail, raise an error
+            error_msg = f"Failed to retrieve API key from both Vault (path: '{secret_path}', key: '{secret_key}') and Streamlit secrets file"
+            self.logger.critical(error_msg)
+            raise RuntimeError(error_msg)
 
 
 # Geocoding Service
