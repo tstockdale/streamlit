@@ -13,12 +13,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="weather-map-app",
     version="1.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Thomas Stockdale",
+    author_email="stockdale.thomas@gmail.com",
     description="A Streamlit application for displaying weather information and interactive maps for cities worldwide",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/weather-map-app",
+    url="https://github.com/yourusername/streamlit",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
