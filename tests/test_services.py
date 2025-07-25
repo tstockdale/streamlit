@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock, mock_open
 import requests
 import hvac #type: ignore
+import os
 from src.weather_map.services import (
     WeatherServiceFactory, 
     VaultService, 
@@ -21,7 +22,7 @@ class TestVaultService(unittest.TestCase):
         self.vault_service = WeatherServiceFactory.create_vault_service()
     
     @patch('src.weather_map.services.hvac.Client')
-    def test_get_api_key_success(self, mock_hvac_client):
+    def test_get_api_key_success_from_vault(self, mock_hvac_client):
         """Test successful API key retrieval from Vault."""
         # Mock the Vault client and response
         mock_client = Mock()
@@ -40,33 +41,120 @@ class TestVaultService(unittest.TestCase):
             token='test_token'
         )
     
+    @patch('src.weather_map.services.os.path.exists')
+    @patch('builtins.open', new_callable=mock_open, read_data='SECRET_KEY_VALUE = "fallback_api_key_456"')
+    @patch('src.weather_map.services.toml.load')
     @patch('src.weather_map.services.hvac.Client')
-    def test_get_api_key_not_found(self, mock_hvac_client):
-        """Test API key retrieval when key is not found in Vault."""
+    def test_get_api_key_vault_not_found_fallback_success(self, mock_hvac_client, mock_toml_load, mock_file, mock_exists):
+        """Test API key retrieval when key is not found in Vault but found in secrets file."""
+        # Mock Vault failure (key not found)
         mock_client = Mock()
         mock_hvac_client.return_value = mock_client
         mock_client.secrets.kv.read_secret_version.return_value = {
             'data': {'data': {'other_key': 'other_value'}}
         }
         
-        with self.assertRaises(ValueError) as context:
-            self.vault_service.get_api_key(
-                'test/path', 'api_key', 'https://vault.example.com', 'test_token'
-            )
+        # Mock secrets file exists and contains the key
+        mock_exists.return_value = True
+        mock_toml_load.return_value = {'SECRET_KEY_VALUE': 'fallback_api_key_456'}
         
-        self.assertIn("Key 'api_key' not found", str(context.exception))
+        result = self.vault_service.get_api_key(
+            'test/path', 'api_key', 'https://vault.example.com', 'test_token'
+        )
+        
+        self.assertEqual(result, 'fallback_api_key_456')
+        # Check that exists was called with the secrets file path (among other calls)
+        mock_exists.assert_any_call('.streamlit/secrets.toml')
+        mock_toml_load.assert_called_once()
     
+    @patch('src.weather_map.services.os.path.exists')
+    @patch('builtins.open', new_callable=mock_open, read_data='SECRET_KEY_VALUE = "fallback_api_key_789"')
+    @patch('src.weather_map.services.toml.load')
     @patch('src.weather_map.services.hvac.Client')
-    def test_get_api_key_connection_error(self, mock_hvac_client):
-        """Test API key retrieval when Vault connection fails."""
+    def test_get_api_key_vault_connection_error_fallback_success(self, mock_hvac_client, mock_toml_load, mock_file, mock_exists):
+        """Test API key retrieval when Vault connection fails but secrets file works."""
+        # Mock Vault connection failure
         mock_hvac_client.side_effect = Exception("Connection failed")
+        
+        # Mock secrets file exists and contains the key
+        mock_exists.return_value = True
+        mock_toml_load.return_value = {'SECRET_KEY_VALUE': 'fallback_api_key_789'}
+        
+        result = self.vault_service.get_api_key(
+            'test/path', 'api_key', 'https://vault.example.com', 'test_token'
+        )
+        
+        self.assertEqual(result, 'fallback_api_key_789')
+        # Check that exists was called with the secrets file path (among other calls)
+        mock_exists.assert_any_call('.streamlit/secrets.toml')
+        mock_toml_load.assert_called_once()
+    
+    @patch('src.weather_map.services.os.path.exists')
+    @patch('src.weather_map.services.hvac.Client')
+    def test_get_api_key_vault_fails_secrets_file_not_found(self, mock_hvac_client, mock_exists):
+        """Test API key retrieval when both Vault and secrets file fail."""
+        # Mock Vault connection failure
+        mock_hvac_client.side_effect = Exception("Connection failed")
+        
+        # Mock secrets file doesn't exist
+        def exists_side_effect(path):
+            if path == '.streamlit/secrets.toml':
+                return False
+            return True  # Return True for other paths (like log files)
+        
+        mock_exists.side_effect = exists_side_effect
         
         with self.assertRaises(RuntimeError) as context:
             self.vault_service.get_api_key(
                 'test/path', 'api_key', 'https://vault.example.com', 'test_token'
             )
         
-        self.assertIn("Failed to retrieve API key from Vault", str(context.exception))
+        self.assertIn("Failed to retrieve API key from both Vault", str(context.exception))
+        # Check that exists was called with the secrets file path (among other calls)
+        mock_exists.assert_any_call('.streamlit/secrets.toml')
+    
+    @patch('src.weather_map.services.os.path.exists')
+    @patch('builtins.open', new_callable=mock_open, read_data='OTHER_KEY = "other_value"')
+    @patch('src.weather_map.services.toml.load')
+    @patch('src.weather_map.services.hvac.Client')
+    def test_get_api_key_vault_fails_secrets_key_not_found(self, mock_hvac_client, mock_toml_load, mock_file, mock_exists):
+        """Test API key retrieval when Vault fails and secrets file doesn't contain the key."""
+        # Mock Vault connection failure
+        mock_hvac_client.side_effect = Exception("Connection failed")
+        
+        # Mock secrets file exists but doesn't contain SECRET_KEY_VALUE
+        mock_exists.return_value = True
+        mock_toml_load.return_value = {'OTHER_KEY': 'other_value'}
+        
+        with self.assertRaises(RuntimeError) as context:
+            self.vault_service.get_api_key(
+                'test/path', 'api_key', 'https://vault.example.com', 'test_token'
+            )
+        
+        self.assertIn("Failed to retrieve API key from both Vault", str(context.exception))
+        # Check that exists was called with the secrets file path (among other calls)
+        mock_exists.assert_any_call('.streamlit/secrets.toml')
+        mock_toml_load.assert_called_once()
+    
+    @patch('src.weather_map.services.os.path.exists')
+    @patch('builtins.open', side_effect=IOError("File read error"))
+    @patch('src.weather_map.services.hvac.Client')
+    def test_get_api_key_vault_fails_secrets_file_read_error(self, mock_hvac_client, mock_file, mock_exists):
+        """Test API key retrieval when Vault fails and secrets file has read error."""
+        # Mock Vault connection failure
+        mock_hvac_client.side_effect = Exception("Connection failed")
+        
+        # Mock secrets file exists but can't be read
+        mock_exists.return_value = True
+        
+        with self.assertRaises(RuntimeError) as context:
+            self.vault_service.get_api_key(
+                'test/path', 'api_key', 'https://vault.example.com', 'test_token'
+            )
+        
+        self.assertIn("Failed to retrieve API key from both Vault", str(context.exception))
+        # Check that exists was called with the secrets file path (among other calls)
+        mock_exists.assert_any_call('.streamlit/secrets.toml')
 
 
 class TestGeocodingService(unittest.TestCase):
