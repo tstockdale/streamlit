@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock, MagicMock
 import requests
-import hvac
+import hvac #type: ignore
 from src.weather_map.services import (
     WeatherServiceFactory, 
     VaultService, 

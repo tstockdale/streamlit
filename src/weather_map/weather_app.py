@@ -51,7 +51,7 @@ class WeatherApp:
         load_dotenv()
         self.secret_path = os.getenv("SECRET_PATH")
         self.secret_key = os.getenv("SECRET_KEY")
-        self.vault_url = os.getenv("VAULT_URL")
+        self.vault_url = os.getenv("VAULT_ADDR")
         self.vault_token = os.getenv("VAULT_TOKEN")
     
     def _initialize_api_key(self) -> None:
@@ -66,7 +66,7 @@ class WeatherApp:
                 if self.secret_key is None:
                     missing_vars.append("SECRET_KEY")
                 if self.vault_url is None:
-                    missing_vars.append("VAULT_URL")
+                    missing_vars.append("VAULT_ADDR")
                 if self.vault_token is None:
                     missing_vars.append("VAULT_TOKEN")
                 

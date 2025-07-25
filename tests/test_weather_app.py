@@ -256,6 +256,12 @@ class TestWeatherApp(unittest.TestCase):
 class TestWeatherAppIntegration(unittest.TestCase):
     """Integration tests for WeatherApp that test component interactions."""
     
+    @patch.dict('os.environ', {
+        'SECRET_PATH': 'test/path',
+        'SECRET_KEY': 'test_key',
+        'VAULT_ADDR': 'https://test-vault.com',
+        'VAULT_TOKEN': 'test_token'
+    })
     @patch('src.weather_map.weather_app.WeatherServiceFactory.create_vault_service')
     def test_initialization_with_vault_success(self, mock_vault_factory):
         """Test WeatherApp initialization with successful Vault connection."""
@@ -269,6 +275,12 @@ class TestWeatherAppIntegration(unittest.TestCase):
         mock_vault_factory.assert_called_once()
         mock_vault_service.get_api_key.assert_called_once()
     
+    @patch.dict('os.environ', {
+        'SECRET_PATH': 'test/path',
+        'SECRET_KEY': 'test_key',
+        'VAULT_ADDR': 'https://test-vault.com',
+        'VAULT_TOKEN': 'test_token'
+    })
     @patch('src.weather_map.weather_app.WeatherServiceFactory.create_vault_service')
     def test_initialization_with_vault_failure(self, mock_vault_factory):
         """Test WeatherApp initialization with Vault connection failure."""
